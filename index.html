@@ -5,15 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
   <script src="https://unpkg.com/vuex@3.0.1/dist/vuex.js"></script>
-  <script src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js"></script>
   <script defer src="https://use.fontawesome.com/releases/v5.0.0/js/all.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css" />
 </head>
 <body>
   <div id="app">
-    <router-link to="/">Listagem</router-link>
-    <router-link to="/new">Novo</router-link>
-    <router-view></router-view>
     <div class="container is-fluid">
       <div class="box">
         <div class="field">
@@ -36,6 +32,30 @@
             <button class="button is-text" @click="clearUser">Limpar</button>
           </div>
         </div>
+      </div>
+      <div class="box">
+        <table v-if="users.length" class="table is-bordered is-striped is-narow is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>Idade</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(user, index) in users">
+              <td>{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.idade }}</td>
+              <td>
+                <button @click="show(user)" class="button is-info"><i class="fa fa-pencil-alt"></i></button>
+                <button @click="destroy(user)" class="button is-info"><i class="fa fa-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-else="users.length">Sem usuário cadastrado</p>
       </div>
     </div>
     <modal :class="{'is-active': modal.show}" :title="modal.title" :content="modal.content" :cancel="modal.cancel" :success="modal.success"></modal>
@@ -78,40 +98,6 @@
       }
     });
 
-    var UsersTable = Vue.component('user-table', {
-      computed: {
-        users: function() {
-          return this.$store.state.users;
-        }
-      },
-      template: `
-        <div class="box">
-          <table v-if="users.length" class="table is-bordered is-striped is-narow is-hoverable is-fullwidth">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nome</th>
-                <th>Idade</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(user, index) in users">
-                <td>{{ user.id }}</td>
-                <td>{{ user.name }}</td>
-                <td>{{ user.idade }}</td>
-                <td>
-                  <button @click="show(user)" class="button is-info"><i class="fa fa-pencil-alt"></i></button>
-                  <!--button @click="$router.push('/' + user.id)" class="button is-info"><i class="fa fa-pencil-alt"></i></button-->
-                  <button @click="destroy(user)" class="button is-info"><i class="fa fa-trash"></i></button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <p v-else="users.length">Sem usuário cadastrado</p>
-        </div>`
-    });
-
     Vue.component('modal', {
       props: ['title', 'content', 'success', 'cancel'],
       methods: {
@@ -123,14 +109,6 @@
         }
       },
       template: '<div class="modal"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">{{ title }}</p><button @click="no" class="delete" aria-label="close"></button></header><section class="modal-card-body"><slot>{{ content }}</slot></section><footer class="modal-card-foot"><button @click="yes" class="button is-success">Sim</button><button @click="no" class="button">Não</button></footer></div></div>'
-    });
-
-    var router = new VueRouter({
-      routes: [
-        { path: '/', component: UsersTable },
-        { path: '/new', component: { template: '<div>NOVO</div>' } },
-        { path: '/:id', component: { template: '<div>EDIT</div>' } },
-      ]
     });
 
     var app = new Vue({
@@ -146,7 +124,6 @@
           return this.$store.state.users;
         }
       },
-      router: router,
       store: usersStore,
       created: function() {
         this.$store.commit('getAll');
