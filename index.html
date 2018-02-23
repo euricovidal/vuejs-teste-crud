@@ -1,10 +1,11 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>Welcome to Vue</title>
+  <title>CRUD VueJS + Vuex + Router</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
   <script src="https://unpkg.com/vuex@3.0.1/dist/vuex.js"></script>
+  <script src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js"></script>
   <script defer src="https://use.fontawesome.com/releases/v5.0.0/js/all.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css" />
 </head>
@@ -12,151 +13,26 @@
   <div id="app">
     <div class="container is-fluid">
       <div class="box">
-        <div class="field">
-          <label class="label">Nome</label>
-          <div class="control">
-            <input class="input" ref="name" @keypress.enter="save" v-model.trim="user.name" type="text" placeholder="ex: Nome">
-          </div>
+        <div class="tabs">
+          <ul>
+            <router-link to="/" active-class="is-active" tag="li" exact>
+              <a>
+                <span class="icon is-small"><i class="fas fa-list"></i></span>
+                <span>Listagem</span>
+              </a>
+            </router-link>
+            <router-link to="/new" active-class="is-active" tag="li">
+              <a>
+                <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                <span>Novo</span>
+              </a>
+            </router-link>
+          </ul>
         </div>
-        <div class="field">
-          <label class="label">Idade</label>
-          <div class="control">
-            <input class="input" @keypress.enter="save" v-model.trim.number="user.idade" type="text" placeholder="ex: Idade">
-          </div>
-        </div>
-        <div class="field is-grouped">
-          <div class="control">
-            <button class="button is-link" :class="{'is-loading': $store.state.loading }" @click="save">Salvar</button>
-          </div>
-          <div class="control">
-            <button class="button is-text" @click="clearUser">Limpar</button>
-          </div>
-        </div>
-      </div>
-      <div class="box">
-        <table v-if="users.length" class="table is-bordered is-striped is-narow is-hoverable is-fullwidth">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nome</th>
-              <th>Idade</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(user, index) in users">
-              <td>{{ user.id }}</td>
-              <td>{{ user.name }}</td>
-              <td>{{ user.idade }}</td>
-              <td>
-                <button @click="show(user)" class="button is-info"><i class="fa fa-pencil-alt"></i></button>
-                <button @click="destroy(user)" class="button is-info"><i class="fa fa-trash"></i></button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p v-else="users.length">Sem usuário cadastrado</p>
+        <router-view></router-view>
       </div>
     </div>
-    <modal :class="{'is-active': modal.show}" :title="modal.title" :content="modal.content" :cancel="modal.cancel" :success="modal.success"></modal>
   </div>
-
-  <script>
-    usersStore = new Vuex.Store({
-      state: {
-        loading: false,
-        user: { id: null, name: null, idade: null },
-        users: []
-      },
-      mutations: {
-        getAll: function(state) {
-          state.users = JSON.parse(localStorage.getItem('users')) || [];
-        },
-        persist: function(state) {
-          if(state.user.id) {
-            userIndex = null;
-            state.users.filter(function(user, index) {
-              if(user.id == state.user.id) userIndex = index;
-            });
-            state.users[userIndex] = state.user;
-          } else {
-            nextId = (state.users[state.users.length - 1] || {id: 0}).id + 1;
-            state.users.push(Object.assign(state.user, { id: nextId }));
-          }
-          localStorage.setItem('users', JSON.stringify(state.users));
-          state.user = {};
-          state.loading = false;
-        },
-        destroy: function(state, user) {
-          userIndex = null;
-          state.users.filter(function(u, index) {
-            if(u.id == user.id) userIndex = index;
-          });
-          state.users.splice(userIndex, 1);
-          localStorage.setItem('users', JSON.stringify(state.users));
-        }
-      }
-    });
-
-    Vue.component('modal', {
-      props: ['title', 'content', 'success', 'cancel'],
-      methods: {
-        yes: function() {
-          this.success();
-        },
-        no: function() {
-          this.cancel();
-        }
-      },
-      template: '<div class="modal"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">{{ title }}</p><button @click="no" class="delete" aria-label="close"></button></header><section class="modal-card-body"><slot>{{ content }}</slot></section><footer class="modal-card-foot"><button @click="yes" class="button is-success">Sim</button><button @click="no" class="button">Não</button></footer></div></div>'
-    });
-
-    var app = new Vue({
-      el: '#app',
-      data: {
-        modal: { show: false, title: null },
-      },
-      computed: {
-        user: function() {
-          return this.$store.state.user;
-        },
-        users: function() {
-          return this.$store.state.users;
-        }
-      },
-      store: usersStore,
-      created: function() {
-        this.$store.commit('getAll');
-      },
-      methods: {
-        clearUser: function() {
-          this.$store.state.user = {};
-        },
-        save: function() {
-          if(!this.user.name || !this.user.idade) return;
-          this.$store.state.loading = true;
-          this.$store.commit('persist');
-          this.$refs.name.focus();
-        },
-        show: function(user) {
-          this.$store.state.user = Object.assign({}, user); // criado novo objecto para não alterar o atual automatico
-        },
-        destroy: function(user) {
-          this.modal.title = 'Apagar usuário';
-          this.modal.content = 'Certeza que deseja apagar o usuário ' + user.name + '?';
-          this.modal.success = () => {
-            this.$store.commit('destroy', user); //mutation
-            //this.$store.dispatch('destroy', user); //action, pq usar action??
-            this.resetModal();
-          }
-          this.modal.cancel = this.resetModal
-          this.modal.show = true;
-        },
-        resetModal: function() {
-          this.modal = { show: false };
-        }
-      },
-    })
-  </script>
+  <script src="./scripts.js"></script>
 </body>
 </html>
