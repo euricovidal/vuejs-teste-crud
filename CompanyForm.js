@@ -1,36 +1,28 @@
-﻿var UserForm = Vue.component('user-form', {
+﻿var CompanyForm = Vue.component('company-form', {
   created: function() {
     this.$store.dispatch('get', this.$route.params.id);
   },
   computed: {
-    user: function() {
-      return this.$store.state.user;
+    company: function() {
+      return this.$store.state.company;
     }
   },
   methods: {
-    clearUser: function() {
-      this.$store.state.user = {};
-      this.$router.push('/users');
+    clearcompany: function() {
+      this.$store.state.company = {};
+      this.$router.push('/companies');
     },
     save: function() {
       if(!this.$_validate()) return;
       this.$store.state.loading = true;
       this.$store.dispatch('persist', () => {
-        this.$router.push('/users');
+        this.$router.push('/companies');
       });
     },
     $_validate: function() {
       var valid = true;
 
-      if(!this.user.idade || typeof(this.user.idade) !== 'number') {
-        this.$refs.age.focus();
-        this.$refs.age.classList.add('is-danger');
-        valid = false;
-      } else {
-        this.$refs.age.classList.remove('is-danger');
-      }
-
-      if(!this.user.name) {
+      if(!this.company.name) {
         this.$refs.name.focus();
         this.$refs.name.classList.add('is-danger');
         valid = false;
@@ -49,13 +41,7 @@
       <div class="field">
         <label class="label">Nome</label>
         <div class="control">
-          <input class="input" ref="name" @keypress.enter="save" v-model.trim="user.name" type="text" placeholder="ex: Nome">
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Idade</label>
-        <div class="control">
-          <input class="input" ref="age" @keypress.enter="save" v-model.trim.number="user.idade" type="text" placeholder="ex: 20">
+          <input class="input" ref="name" @keypress.enter="save" v-model.trim="company.name" type="text" placeholder="ex: Nome">
         </div>
       </div>
       <div class="field is-grouped">
@@ -63,7 +49,7 @@
           <button class="button is-link" :class="{'is-loading': $store.state.loading }" @click="save">Salvar</button>
         </div>
         <div class="control">
-          <button class="button is-text" @click="clearUser">Cancelar</button>
+          <button class="button is-text" @click="clearcompany">Cancelar</button>
         </div>
       </div>
     </div>`

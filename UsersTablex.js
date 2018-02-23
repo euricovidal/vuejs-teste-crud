@@ -1,12 +1,12 @@
 ﻿var UsersTable = Vue.component('user-table', {
   data () {
     return {
-      modal: { show: false }
+      modal: { show: false, title: '' }
     };
   },
   computed: {
     users: function() {
-      return this.$store.state.users;
+      return this.$store.state.all;
     }
   },
   created: function() {
@@ -14,20 +14,20 @@
   },
   methods: {
     show: function(user) {
-      this.$router.push('/' + user.id);
+      this.$router.push('/users/' + user.id);
     },
     destroy: function(user) {
       this.modal.title   = 'Apagar usuário';
       this.modal.content = 'Certeza que deseja apagar o usuário ' + user.name + '?';
       this.modal.cancel  = this.$_resetModal
       this.modal.success = () => {
-        this.$store.dispatch('destroy', user);
+        this.$store.dispatch('destroyUser', user);
         this.$_resetModal();
       }
       this.modal.show = true;
     },
     $_resetModal: function() {
-      this.modal = { show: false };
+      this.modal = { show: false, title: '' };
     }
   },
   template: `

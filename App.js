@@ -1,7 +1,15 @@
 ﻿var app = new Vue({
   el:       '#app',
-  data:     {},
+  data:     { menu: { opened: false } },
   computed: {},
   router:   Router,
-  store:    UsersStore
+  store:    CommonStore,
+  created: function() {
+    this.$store.dispatch('getUser');
+  },
+  methods: {
+    toggleMenu: function() {
+      this.menu.opened = !this.menu.opened;
+    }
+  }
 })
