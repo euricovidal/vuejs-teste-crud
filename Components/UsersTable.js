@@ -21,7 +21,7 @@
       this.modal.content = 'Certeza que deseja apagar o usuário ' + user.name + '?';
       this.modal.cancel  = this.$_resetModal
       this.modal.success = () => {
-        this.$store.dispatch('destroyUser', user);
+        this.$store.dispatch('destroy', user);
         this.$_resetModal();
       }
       this.modal.show = true;
