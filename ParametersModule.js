@@ -1,5 +1,5 @@
 ﻿var ParametersModule = {
   state: {
-    parameters: { pageTitle: 'Título Demo' }
+    parameters: { pageTitle: 'Título da Página' }
   }
 };

@@ -6,6 +6,6 @@
   },
   template: `
     <div>
-      <p>Seja bem vindo <i>{{ userName }}</i></p>
+      <h3 class="title is-5">Seja bem vindo <i>{{ userName }}</i></h3>
     </div>`
 });
